@@ -56,6 +56,8 @@ const UpdateProduct = ({ id }) => {
   
         console.log('Product updated:', response.data);
         alert('Product updated');
+
+        window.location.reload();
       } catch (error) {
         console.error('Error updating product:', error);
         alert('Failed to update product');
@@ -64,30 +66,14 @@ const UpdateProduct = ({ id }) => {
   };
   
     console.log("inside : ", id)
-const bg = {
-  // backgroundImage:`linear-gradient(rgba(248, 247, 247, 0.1),rgba(248, 247, 247, 0.7)), url('./Images/bg1.png')`, 
-  // backgroundSize: 'cover',
-  // backgroundPosition: 'center'
-}
-const content = {
 
-  backgroundColor: 'rgba(255, 255, 255, 0.5)',
-  padding: '30px',
-  borderRadius: '8px',
-  boxShadow: '10px 10px 10px black',
-  // width: '430px',
-  // height : '400px',
-  fontSize: '18px',
-    color: '#1f2535',
-    fontWeight: 'bold',
-    fontStyle: 'italic',
-};
+
   return (
-    <div style={bg}>
+    <div>
       <div class="container">
       <div>
         <div className='text-center' style={{height:'620px'}}>
-          <div style={content} >
+          <div >
         <p >Product ID : <input type='text' placeholder='enter your productid' name='productid' value={id} onChange={handleChange} />{formData.productid}</p>
         <p >Product Name : <input type='text' placeholder='enter your productname' name='productname' value={formData.productname} onChange={handleChange} /></p>
         <p>Description : <input type='text' placeholder='enter your description' name='description' value={formData.description} onChange={handleChange} /></p>

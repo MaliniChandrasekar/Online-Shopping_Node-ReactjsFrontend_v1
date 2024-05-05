@@ -1,16 +1,22 @@
 import React from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useState } from 'react'
 import loginbg from '../loginbg.jpg'
 
 const SignUp = () => {
   const {price} = useParams()
+  const navigate = useNavigate()
   const [FormData, setData] = useState({
     firstname: "",
     lastname: "",
     email: "",
-    city: "",
-    password: ""
+    password: "",
+     // Add address fields to the form state
+     doorno : "",
+     street: "",
+     city: "",
+     state: "",
+    pincode:""
   })
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -21,7 +27,7 @@ const SignUp = () => {
     // event.preventDefault();
     console.log(FormData);
   
-    if (!FormData.firstname || !FormData.lastname || !FormData.city) {
+    if (!FormData.firstname || !FormData.lastname || !FormData.city || !FormData.doorno || !FormData.street || !FormData.city || !FormData.state || !FormData.pincode) {
       alert("Please fill in all required fields");
     } else if (!isValidEmail(FormData.email)) {
       alert("Please enter a valid email address");
@@ -45,8 +51,14 @@ const SignUp = () => {
               firstname: FormData.firstname,
               lastname: FormData.lastname,
               email: FormData.email,
-              city: FormData.city,
-              password: FormData.password
+              password: FormData.password,
+              addressData: {
+                doorno : FormData.doorno,
+                street: FormData.street,
+                city: FormData.city,
+                state: FormData.state,
+                pincode : FormData.pincode
+            }
             };
   
             // Send signup data to the backend
@@ -63,6 +75,8 @@ const SignUp = () => {
               }
               console.log("Data received ", response);
               alert("Register Successfully..!");
+              alert("Kindly Login to Proceed..!")
+              navigate(`/login/${response.firstname}`)
             })
             .catch((error) => {
               console.error("Error:", error);
@@ -97,7 +111,7 @@ const SignUp = () => {
     borderRadius: '8px',
     boxShadow: '10px 10px 10px black',
     width: '400px',
-    height : '450px'
+    height : '600px'
 };
   const m1 = {
     fontWeight : 'bold',
@@ -120,9 +134,15 @@ const SignUp = () => {
             <p style={m1}>Lastname : <input type='text' placeholder='enter your lastname' name='lastname' value={FormData.lastname} onChange={handleChange}/></p>
             <p style={m1}>Email : <input type='email' placeholder='enter your mail-id' name='email' value={FormData.email} onChange={handleChange} required/></p>
             {/* <p>Re-enter Email : <input type='text' placeholder='re-enter your mail-id' required/></p> */}
-          <p style={m1}>City : <input type='text' placeholder='enter your city' name='city' value={FormData.city} onChange={handleChange}/></p> 
-          <p style={m1}>Password : <input type='password' placeholder='enter your password' name='password' value={FormData.password} onChange={handleChange} required/></p>
+           <p style={m1}>Password : <input type='password' placeholder='enter your password' name='password' value={FormData.password} onChange={handleChange} required/></p>
             {/* <p>Re-enter Password : <input type='password' placeholder='re-enter your password' required/></p> */}
+            <p style={m1}>Door No : <input type='number' placeholder='enter your doorno' name='doorno' value={FormData.doorno} onChange={handleChange}/></p>
+            <p style={m1}>Street : <input type='text' placeholder='enter your street' name='street' value={FormData.street} onChange={handleChange}/></p>
+            <p style={m1}>City : <input type='text' placeholder='enter your city' name='city' value={FormData.city} onChange={handleChange} required/></p>
+            <p style={m1}>State : <input type='text' placeholder='enter your state' name='state' value={FormData.state} onChange={handleChange}/></p>
+            <p style={m1}>Pincode : <input type='number' placeholder='enter your pincode' name='pincode' value={FormData.pincode} onChange={handleChange}/></p>
+           
+            
             <p  style={m1}>Already have an account? : <Link to={`/login/${price}`}>Login</Link></p>
             <button onClick={handleSubmit}>SignUp</button>
         </div>

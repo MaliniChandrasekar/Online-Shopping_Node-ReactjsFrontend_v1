@@ -21,18 +21,21 @@ import Payment from './Components/Payment';
 import AboutUs from './Components/AboutUs';
 import Footer from './Components/Footer';
 import WishList from './Components/WishList';
+import Location  from './Components/Location';
+
 
 function App() {
   return (
     <div className="App">
        <BrowserRouter>
+    
       <Routes>
       <Route path="/login/:price" element = {<Login />}></Route>
       <Route path="/signup/:price" element = {<SignUp />}></Route>
       <Route path="/addproduct" element={<AddProduct />}></Route>
       <Route path="/home1" element={<Home />}></Route>
       <Route path="/addcategory" element={<AddCategory />}></Route>
-      <Route path="/user" element={<User />}></Route>
+      <Route path="/" element={<User />}></Route>
       <Route path ="/admin/:firstname" element= {<Admin1 />}></Route>
       <Route path ="/update" element= {<UpdateProduct />}></Route>
       <Route path= "/furniture/:category" element = {<Furniture />}></Route>
@@ -45,7 +48,9 @@ function App() {
       <Route path = "/about" element = {<AboutUs />}></Route>
       <Route path = "/footer" element = {<Footer />}></Route>
       <Route path = "/wish" element = {<WishList />} />
+      <Route path = "/L/:price" element = {<Location />} />
      </Routes>
+
     </BrowserRouter>
     </div>
   );

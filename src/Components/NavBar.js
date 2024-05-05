@@ -2,12 +2,21 @@ import React, { useState } from 'react';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Logo from '../logo1.PNG'
+import { useNavigate } from 'react-router-dom';
 
 function NavBar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
+  const navigate = useNavigate()
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
+  };
+
+  const handleLogout = () => {
+    // Perform logout logic...
+    // setIsLoggedIn(false);
+    // Remove user ID from sessionStorage
+    sessionStorage.removeItem('userId');
+    navigate("/")
   };
 
   const logo1 = {
@@ -26,30 +35,30 @@ function NavBar() {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <a className="nav-link active fw-bold" aria-current="page" href="/user">Home</a>
+              <a className="nav-link active fw-bold" aria-current="page" href="/">HOME</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link active  fw-bold" href="/furniture/Furniture">
-                HomeDecors
+              <a className="nav-link active  fw-bold" href="/">
+                ABOUT
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link active fw-bold" href="/sofa/Sofas&Seating">
-                Mirrors
+              <a className="nav-link active fw-bold" href="#category">
+                CATEGORY
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link active fw-bold" href="/home/HomeDecor">
-              Lamps&Lightings
+              <a className="nav-link active fw-bold" href="/">
+              BLOG
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link active fw-bold" href="/kitchen/Lamps&Lightings">
-                Sofa&Seatings
+              <a className="nav-link active fw-bold" href="/">
+               PAGES
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link active fw-bold" href="#contact">Contact Us</a>
+              <a className="nav-link active fw-bold" href="#contact">CONTACT</a>
             </li>
           </ul>
           <div className="d-flex">
@@ -74,6 +83,7 @@ function NavBar() {
                 <div className={`dropdown-menu${dropdownOpen ? ' show' : ''}`} aria-labelledby="navbarDropdown">
                   {/* Dropdown items */}
                   <a className="dropdown-item" href="/login/price">Admin</a>
+                  <a className="dropdown-item" href="" onClick={handleLogout}>Logout</a>
                 </div>
               </div>
             </div>

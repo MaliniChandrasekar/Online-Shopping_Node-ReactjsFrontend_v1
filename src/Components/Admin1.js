@@ -4,6 +4,7 @@ import { AddProduct } from './AddProduct'
 import { Link } from 'react-router-dom'
 import AvailableProduct from './AvailableProduct'
 import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 
 const Admin1 = () => {
@@ -12,14 +13,20 @@ const Admin1 = () => {
   const [name, setName] = useState([]);
   const [formData, setFormData] = useState(null)
   const [customData, setCustomer] = useState(null)
+  const navigate = useNavigate()
 
   //Add a user
   const [FormData, setData] = useState({
     firstname: "",
     lastname: "",
     email: "",
+    password: "",
+    // Add address fields to the form state
+    doorno: "",
+    street: "",
     city: "",
-    password: ""
+    state: "",
+    pincode: ""
   })
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -29,8 +36,8 @@ const Admin1 = () => {
   const handleSubmit = (event) => {
     // event.preventDefault();
     console.log(FormData);
-  
-    if (!FormData.firstname || !FormData.lastname || !FormData.city) {
+
+    if (!FormData.firstname || !FormData.lastname || !FormData.city || !FormData.doorno || !FormData.street || !FormData.city || !FormData.state || !FormData.pincode) {
       alert("Please fill in all required fields");
     } else if (!isValidEmail(FormData.email)) {
       alert("Please enter a valid email address");
@@ -54,10 +61,16 @@ const Admin1 = () => {
               firstname: FormData.firstname,
               lastname: FormData.lastname,
               email: FormData.email,
-              city: FormData.city,
-              password: FormData.password
+              password: FormData.password,
+              addressData: {
+                doorno: FormData.doorno,
+                street: FormData.street,
+                city: FormData.city,
+                state: FormData.state,
+                pincode: FormData.pincode
+              }
             };
-  
+
             // Send signup data to the backend
             fetch("http://localhost:8080/user/insert", {
               headers: {
@@ -66,17 +79,19 @@ const Admin1 = () => {
               method: 'post',
               body: JSON.stringify(SignUp)
             })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error("Failed to register user");
-              }
-              console.log("Data received ", response);
-              alert("New User added..!");
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-              alert("An error occurred while registering");
-            });
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Failed to register user");
+                }
+                console.log("Data received ", response);
+                alert("New User added..!");
+
+                window.location.reload();
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+                alert("An error occurred while registering");
+              });
           }
         })
         .catch((error) => {
@@ -85,7 +100,7 @@ const Admin1 = () => {
         });
     }
   }
-  
+
   //Get User
   const customer = () => {
     fetch("http://localhost:8080/user/list")
@@ -120,6 +135,8 @@ const Admin1 = () => {
       .then((res) => {
         if (res.ok) {
           alert("User deleted successfully.");
+
+          window.location.reload();
         } else {
           console.error("Failed to delete user.");
         }
@@ -138,11 +155,16 @@ const Admin1 = () => {
   // To update a user
 
   const [updateData, setupdateData] = useState({
-    city: "",
     firstname: "",
     lastname: "",
     password: "",
     email: "",
+    // Add address fields to the form state
+    doorno: "",
+    street: "",
+    city: "",
+    state: "",
+    pincode: ""
   });
 
   const handleupdate = (event) => {
@@ -155,11 +177,11 @@ const Admin1 = () => {
   console.log("id", setUpdate)
   const updateSubmit = async (event) => {
     // event.preventDefault(); // Prevent the default form submission behavior
-  
+
     console.log(updateData);
-  
+
     // Perform validation
-    if (!updateData.firstname || !updateData.lastname || !updateData.city) {
+    if (!updateData.firstname || !updateData.lastname || !updateData.city || !updateData.doorno || !updateData.street || !updateData.city || !updateData.state || !updateData.pincode) {
       alert("Please fill in all required fields");
       return; // Exit the function if validation fails
     } else if (!isValidEmail(updateData.email)) {
@@ -169,9 +191,9 @@ const Admin1 = () => {
       alert("Password must be at least 5 characters long");
       return; // Exit the function if password is too short
     }
-  
+
     // Optional: You can add more specific validation rules here
-  
+
     // Check if email already exists
     try {
       const emailCheckResponse = await fetch(`http://localhost:8080/user/checkEmail/${updateData.email}`);
@@ -183,16 +205,22 @@ const Admin1 = () => {
         alert("Email already exists. Please use a different email address.");
         return; // Exit the function if email already exists
       }
-  
+
       // Email is not in the database, proceed with update
       const update = {
         firstname: updateData.firstname,
         lastname: updateData.lastname,
         email: updateData.email,
         password: updateData.password,
-        city: updateData.city
+        addressData: {
+          doorno: updateData.doorno,
+          street: updateData.street,
+          city: updateData.city,
+          state: updateData.state,
+          pincode: updateData.pincode
+        }
       };
-  
+
       const updateResponse = await fetch(`http://localhost:8080/user/${setUpdate}`, {
         headers: {
           "Content-Type": "application/json"
@@ -200,29 +228,37 @@ const Admin1 = () => {
         method: 'PUT',
         body: JSON.stringify(update)
       });
-  
+
       if (!updateResponse.ok) {
         throw new Error("Failed to update user");
       }
-  
+
       const data = await updateResponse.text();
       console.log("Data Received: ", data);
       alert("User updated");
+
+      window.location.reload();
     } catch (error) {
       console.error("Error occurred while updating user", error);
       alert("Failed to update user");
     }
   }
-  
-  
+
+
   // Helper function to validate email format
   function isValidEmail(email) {
     // Regular expression for basic email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
-  
 
+  const handleLogout = () => {
+    // Perform logout logic...
+    // setIsLoggedIn(false);
+    // Remove user ID from sessionStorage
+    sessionStorage.removeItem('userId');
+    navigate("/")
+  };
 
   const product = {
     borderRadius: '8px',
@@ -332,10 +368,14 @@ const Admin1 = () => {
                           <p style={m1}>Lastname : <input type='text' placeholder='enter your lastname' name='lastname' value={FormData.lastname} onChange={handleChange} /></p>
                           <p style={m1}>Email : <input type='text' placeholder='enter your mail-id' name='email' value={FormData.email} onChange={handleChange} required /></p>
                           {/* <p>Re-enter Email : <input type='text' placeholder='re-enter your mail-id' required/></p> */}
-                          <p style={m1}>City : <input type='text' placeholder='enter your city' name='city' value={FormData.city} onChange={handleChange} /></p>
                           <p style={m1}>Password : <input type='password' placeholder='enter your password' name='password' value={FormData.password} onChange={handleChange} required /></p>
-                          {/* <p>Re-enter Password : <input type='password' placeholder='re-enter your password' required/></p> */}
-                          {/* <p >Already have an account? : <Link to="/login">Login</Link></p> */}
+                          <p style={m1}>Door No : <input type='number' placeholder='enter your doorno' name='doorno' value={FormData.doorno} onChange={handleChange} /></p>
+                          <p style={m1}>Street : <input type='text' placeholder='enter your street' name='street' value={FormData.street} onChange={handleChange} /></p>
+                          <p style={m1}>City : <input type='text' placeholder='enter your city' name='city' value={FormData.city} onChange={handleChange} required /></p>
+                          <p style={m1}>State : <input type='text' placeholder='enter your state' name='state' value={FormData.state} onChange={handleChange} /></p>
+                          <p style={m1}>Pincode : <input type='number' placeholder='enter your pincode' name='pincode' value={FormData.pincode} onChange={handleChange} /></p>
+
+
                           <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="button" class="btn btn-primary" onClick={handleSubmit}>Add</button>
@@ -354,9 +394,9 @@ const Admin1 = () => {
                   <th scope="col">ID</th>
                   <th scope="col">FirstName</th>
                   <th scope="col">LastName</th>
-                  <th scope="col">City</th>
                   <th scope="col">Email</th>
                   <th scope="col">Password</th>
+                  <th scope='col'>Address</th>
                   <th scope='col'>Edit/Delete</th>
                 </tr>
               </thead>
@@ -366,9 +406,15 @@ const Admin1 = () => {
                     <td >{customData._id}</td>
                     <td >{customData.firstname}</td>
                     <td>{customData.lastname}</td>
-                    <td>{customData.city}</td>
                     <td>{customData.email}</td>
                     <td style={{ maxWidth: "150px", wordWrap: "break-word" }}>{customData.password}</td>
+                    <td>
+                     <div>No {customData.address.doorno}</div> 
+                     <div>{customData.address.street}</div> 
+                     <div>{customData.address.city}</div>
+                     <div>{customData.address.state}</div>
+                     <div>{customData.address.pincode}</div>
+                      </td>
                     <td><button className='m-2' data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" onClick={() => setSelectedUpdate(customData._id)}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
                       <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
                     </svg></button><button data-bs-toggle="modal" data-bs-target="#exampleModal" onClick={() => setSelectedDelete(customData._id)}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
@@ -391,10 +437,16 @@ const Admin1 = () => {
                   <p style={m1}>Lastname : <input type='text' placeholder='enter your lastname' name='lastname' value={updateData.lastname} onChange={handleupdate} /></p>
                   <p style={m1}>Email : <input type='text' placeholder='enter your mail-id' name='email' value={updateData.email} onChange={handleupdate} required /></p>
                   {/* <p>Re-enter Email : <input type='text' placeholder='re-enter your mail-id' required/></p> */}
-                  <p style={m1}>City : <input type='text' placeholder='enter your city' name='city' value={updateData.city} onChange={handleupdate} /></p>
                   <p style={m1}>Password : <input type='password' placeholder='enter your password' name='password' value={updateData.password} onChange={handleupdate} required /></p>
                   {/* <p>Re-enter Password : <input type='password' placeholder='re-enter your password' required/></p> */}
                   {/* <p >Already have an account? : <Link to="/login">Login</Link></p> */}
+                  <p style={m1}>Door No : <input type='number' placeholder='enter your doorno' name='doorno' value={updateData.doorno} onChange={handleupdate} /></p>
+                  <p style={m1}>Street : <input type='text' placeholder='enter your street' name='street' value={updateData.street} onChange={handleupdate} /></p>
+                  <p style={m1}>City : <input type='text' placeholder='enter your city' name='city' value={updateData.city} onChange={handleupdate} required /></p>
+                  <p style={m1}>State : <input type='text' placeholder='enter your state' name='state' value={updateData.state} onChange={handleupdate} /></p>
+                  <p style={m1}>Pincode : <input type='number' placeholder='enter your pincode' name='pincode' value={updateData.pincode} onChange={handleupdate} /></p>
+
+
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary m-2" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" onClick={() => updateSubmit()}>Update</button>
@@ -433,7 +485,7 @@ const Admin1 = () => {
           </div>
           <div className="tab-pane fade p-3 border w-50 text-center col-12" id="nav-connect1" role="tabpanel" aria-labelledby="nav-connect1-tab" style={product1}>
             <div >Admin : {firstname}</div><br></br>
-            <Link to="/login/:category" className=' m-3' style={{ textDecoration: 'none' }}><button>Logout</button></Link>
+            <div className=' m-3' style={{ textDecoration: 'none' }} onClick={handleLogout}><button>Logout</button></div>
           </div>
         </div>
 

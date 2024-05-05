@@ -51,6 +51,8 @@ export const AddProduct = () => {
           });
           console.log('Product added:', response.data);
           alert('Product Added');
+
+          window.location.reload();
         } catch (error) {
           console.error('Error adding product:', error);
         }

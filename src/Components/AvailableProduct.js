@@ -25,7 +25,7 @@ const AvailableProduct = ({ onClose, onDelete }) => {
   const handleSubmit = (event) => {
     // event.preventDefault();
     console.log(formData);
-    fetch(`http://localhost:8080/product/list`)
+    fetch(`http://localhost:8080/product`)
     
       .then((response) => {
         if (!response.ok) {
@@ -61,6 +61,8 @@ const AvailableProduct = ({ onClose, onDelete }) => {
       .then((res) => {
         if (res.ok) {
           alert("Product deleted successfully.");
+
+          window.location.reload();
         } else {
           console.error("Failed to delete user.");
         }
