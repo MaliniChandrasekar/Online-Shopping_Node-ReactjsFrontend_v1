@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import location from '../save.png'
 import { useParams, Link } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 
 const Location = () => {
-    const {price} = useParams()
+    const { price } = useParams()
     const [userData, setUserData] = useState(null);
     const [addressData, setAddressData] = useState({
         doorno: '',
@@ -14,6 +14,38 @@ const Location = () => {
         pincode: ''
     });
     const userId = sessionStorage.getItem('userId');
+    const navigate = useNavigate()
+
+    const handleSubmit = (e) => {
+        console.log(addressData)
+        const data = {
+            doorno: addressData.doorno,
+            street: addressData.street,
+            city: addressData.city,
+            state: addressData.state,
+            pincode: addressData.pincode
+          }
+          fetch(`http://localhost:8080/user/${userId}`, {
+              headers: {
+                "Content-Type": "application/json"
+              },
+              method: 'post',
+              body: JSON.stringify(data)
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Failed to register user");
+                }
+                console.log("Data received ", response);
+                alert("Delivery address added..!");
+                navigate(`/payment/${price}`)
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+                alert("An error occurred while registering");
+              });
+          }
+
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -64,24 +96,27 @@ const Location = () => {
             }}>
                 {userData && (
                     <div>
-                        <div className='text-center' style={{ color : "blue", fontSize: "25px", fontWeight: "bold", marginBottom: "10px" }}>Delivery Address</div>
+                        <div className='text-center' style={{ color: "blue", fontSize: "25px", fontWeight: "bold", marginBottom: "10px" }}>Delivery Address</div>
                         <div className='p-5' style={{
                             height: "360px",
                             width: "400px",
                             backgroundColor: "white",
                             border: "2px solid skyblue",
                             borderRadius: "20px",
-                            color : "blue",
-                            fontWeight : "bold"
+                            color: "blue",
+                            fontWeight: "bold"
                         }}>
-                           <p>Door No: <input type='number' name="doorno" value={addressData.doorno} onChange={handleChange} style={inputStyle} /></p>
-                            <p>Street: <input type='text' name="street" value={addressData.street} onChange={handleChange} style={inputStyle} /></p>
-                            <p>City: <input type='text' name="city" value={addressData.city} onChange={handleChange} style={inputStyle} /></p>
-                            <p>State: <input type='text' name="state" value={addressData.state} onChange={handleChange} style={inputStyle} /></p>
-                            <p>Pincode: <input type='number' name="pincode" value={addressData.pincode} onChange={handleChange} style={inputStyle} /></p>
+                            <p>Door No : <input type='number' placeholder='enter your doorno' name='doorno' value={addressData.doorno} onChange={handleChange} /></p>
+                            <p>Street : <input type='text' placeholder='enter your street' name='street' value={addressData.street} onChange={handleChange} /></p>
+                            <p>City : <input type='text' placeholder='enter your city' name='city' value={addressData.city} onChange={handleChange} required /></p>
+                            <p>State : <input type='text' placeholder='enter your state' name='state' value={addressData.state} onChange={handleChange} /></p>
+                            <p>Pincode : <input type='number' placeholder='enter your pincode' name='pincode' value={addressData.pincode} onChange={handleChange} /></p>
+
                             <div className='text-center' >
-                                <Link to={`/payment/${price}`}>
-                                    <button style={{backgroundColor:"green", color : "white",fontWeight : "bold"}}>Confirm</button>
+                                
+                                    <button onClick={(e) => {handleSubmit(e)}}  style={{ backgroundColor: "green", color: "white", fontWeight: "bold" }}>Confirm</button>
+                                    <Link to={`/payment/${price}`}>   
+                                    <button className='m-2' style={{ backgroundColor: "green", color: "white", fontWeight: "bold" }}>Skip</button>
                                 </Link>
                             </div>
                         </div>

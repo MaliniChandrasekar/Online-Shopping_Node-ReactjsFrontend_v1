@@ -19,6 +19,8 @@ const User = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [setFurniture, setSelectedFurniture] = useState('');
   const [isInWishlist, setIsInWishlist] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1); // State variable to track the current page
+  const productsPerPage = 9;
 
   console.log("Get Session storage ", userId)
   const handleSelectChange = (event) => {
@@ -29,21 +31,18 @@ const User = () => {
     handleSubmit(category);
   };
 
-  const handleSubmit = (category) => {
-    let url = `http://localhost:8080/product`;
+  const handlePaginationClick = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleSubmit = (category, page) => {
+    let url = `http://localhost:8080/product?page=${page}`; // Modify the URL to include the page parameter
     if (category) {
-      url += `/${category}`;
+      url = `http://localhost:8080/product/${category}`;
     }
-    fetch(url)
+    axios.get(url)
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data);
-        setSelectedFurniture(data);
+        setSelectedFurniture(response.data);
       })
       .catch((error) => {
         console.error("Error during fetch", error);
@@ -51,9 +50,8 @@ const User = () => {
   };
 
   useEffect(() => {
-    // Initial fetch when the component mounts
-    handleSubmit(selectedCategory);
-  }, [selectedCategory]); // Call useEffect whenever selectedCategory changes
+    handleSubmit(selectedCategory, currentPage); // Call useEffect whenever selectedCategory or currentPage changes
+  }, [selectedCategory, currentPage]);
 
   const CartSend = async (formData) => {
     console.log("Productid", formData)
@@ -66,7 +64,8 @@ const User = () => {
       });
       console.log(response.data); // Log the response from the backend
       alert("Product added to cart successfully..!");
-      setCartUpdated(prevState => !prevState);
+      window.location.reload()
+      // setCartUpdated(prevState => !prevState);
 
       // You can update the UI or show a notification based on the response
     } catch (error) {
@@ -81,18 +80,18 @@ const User = () => {
         console.error('User ID is not available');
         return;
       }
-  
+
       // Ensure formData is not empty
       if (!formData) {
         console.error('Product ID is required');
         return;
       }
-  
+
       const response = await axios.post('http://localhost:8080/wish/add', {
         userId: userId,
         productId: formData
       });
-  
+
       // Check if the response is successful
       if (response.status === 200) {
         alert("Product added to Wishlist successfully!");
@@ -110,8 +109,8 @@ const User = () => {
       alert("Product already exists in wishlist");
     }
   };
-  
-  
+
+
 
   return (
     <div>
@@ -164,7 +163,7 @@ const User = () => {
       <br></br>
 
       <div className='container'>
-      <div id='category'></div>
+        <div id='category'></div>
         <br></br><br></br>
         <h1 className="text-center" style={{ fontSize: '32px', color: '#84cdee', fontWeight: 'bold' }}><font style={{ color: "black" }}>C</font>ategories</h1>
         <br></br>
@@ -268,15 +267,19 @@ const User = () => {
 
                   <div className='col text-end'>
                     {userId ? (
-                      <p onClick={() => WishSend(formData._id)} style={{ borderRadius:
-                       '10px', padding: '5px', width: '100%' }}>
+                      <p onClick={() => WishSend(formData._id)} style={{
+                        borderRadius:
+                          '10px', padding: '5px', width: '100%'
+                      }}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16" className={`text-danger ${isInWishlist ? 'filled' : ''}`}>
                           <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
                         </svg>
+                        
                       </p>
                     ) : (
                       <Link to={`/login/JK?redirect=${encodeURIComponent(location.pathname)}`}><button style={{ borderRadius: '10px', padding: '5px', width: '100%' }}>Login to Add to WishList</button></Link>
                     )}
+                    
                   </div>
                 </div>
               </div>
@@ -284,8 +287,22 @@ const User = () => {
           ))}
         </div>
       </div>
-  
-  
+      <br></br>
+      {/* Pagination buttons */}
+      {selectedCategory === "" && ( // Only render pagination when category is "All"
+        <div className='text-center'>
+          {currentPage > 1 && (
+            <button className='m-4' onClick={() => handlePaginationClick(currentPage - 1)}>
+              Previous Page
+            </button>
+          )}
+          {setFurniture.length === productsPerPage && (
+            <button className=' m-4' onClick={() => handlePaginationClick(currentPage + 1)}>
+              Next Page
+            </button>
+          )}
+        </div>
+      )}
       <br></br>
       <div id='contact'></div>
       <br></br> <br></br><br></br><br></br>

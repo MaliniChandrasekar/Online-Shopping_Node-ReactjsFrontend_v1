@@ -22,9 +22,12 @@ import AboutUs from './Components/AboutUs';
 import Footer from './Components/Footer';
 import WishList from './Components/WishList';
 import Location  from './Components/Location';
+import Order from './Components/Order';
+
 
 
 function App() {
+  
   return (
     <div className="App">
        <BrowserRouter>
@@ -49,6 +52,7 @@ function App() {
       <Route path = "/footer" element = {<Footer />}></Route>
       <Route path = "/wish" element = {<WishList />} />
       <Route path = "/L/:price" element = {<Location />} />
+      <Route path = "/o" element = {<Order/>} />
      </Routes>
 
     </BrowserRouter>

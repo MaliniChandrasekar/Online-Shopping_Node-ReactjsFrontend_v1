@@ -25,7 +25,7 @@ const AvailableProduct = ({ onClose, onDelete }) => {
   const handleSubmit = (event) => {
     // event.preventDefault();
     console.log(formData);
-    fetch(`http://localhost:8080/product`)
+    fetch(`http://localhost:8080/product/list`)
     
       .then((response) => {
         if (!response.ok) {

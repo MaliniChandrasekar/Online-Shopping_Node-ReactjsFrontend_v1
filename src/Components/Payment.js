@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 
@@ -75,7 +75,9 @@ const Payment = () => {
     <div className="container w-50"><br></br>
       <div className='text-center text-primary' style={{ fontWeight: 'bold', fontSize: '22px', fontStyle: 'italic' }}>Payment Details</div>
       <br></br>
-
+      <div className='text-center'>Delivery Address :
+      <Link to={`/L/${price}`}  style={{textDecoration : null}}>  <button>Change</button></Link></div>
+      <br></br>
       <div className='text-center border p-4' style={{ height: '550px', backgroundColor: '#e1eaef', borderRadius: "15px" }}>
         <div className="mb-3">
           <label htmlFor="cardNumber" className="form-label">

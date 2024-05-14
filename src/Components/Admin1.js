@@ -14,6 +14,41 @@ const Admin1 = () => {
   const [formData, setFormData] = useState(null)
   const [customData, setCustomer] = useState(null)
   const navigate = useNavigate()
+  const [setCart, setCartItems] = useState([])
+  const [setOrder, setOrderItems] = useState('')
+  const userId = sessionStorage.getItem('userId')
+
+  const expectedDeliveryDays = 7; // Example value
+    const currentDate = new Date();
+
+    const expectedDeliveryDate = new Date(currentDate);
+    expectedDeliveryDate.setDate(currentDate.getDate() + expectedDeliveryDays);
+
+
+
+  useEffect(() => {
+    console.log("userId", userId)
+    fetch(`http://localhost:8080/order`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Response data", data);
+        // Assuming `data` is an array of orders
+        const allItems = data.map(order => order.items).flat(); // Extract all items from all orders
+        setCartItems(allItems);
+        setOrderItems(data);
+        console.log("D A", data.deliveryAddress)
+        // calculateTotalPrice(data);
+      })
+      .catch(error => {
+        console.error('Error during fetch', error);
+      });
+  }, []);
+
 
   //Add a user
   const [FormData, setData] = useState({
@@ -120,6 +155,9 @@ const Admin1 = () => {
         // Handle the error here, e.g., show a message to the user
       });
   };
+
+
+  
 
   useEffect(() => {
     customer();
@@ -299,6 +337,7 @@ const Admin1 = () => {
             <button class="nav-link " id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Users</button>
             <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Product List</button>
             {/* <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Orders</button> */}
+            <button class="nav-link" id="nav-connect2-tab" data-bs-toggle="tab" data-bs-target="#nav-connect2" type="button" role="tab" aria-controls="nav-connect2" aria-selected="false">Orders List</button>
             <button class="nav-link" id="nav-connect-tab" data-bs-toggle="tab" data-bs-target="#nav-connect" type="button" role="tab" aria-controls="nav-connect" aria-selected="false">Add a New Product</button>
             <button class="nav-link" id="nav-connect1-tab" data-bs-toggle="tab" data-bs-target="#nav-connect1" type="button" role="tab" aria-controls="nav-connect1" aria-selected="false">Accounts</button>
           </div>
@@ -409,12 +448,12 @@ const Admin1 = () => {
                     <td>{customData.email}</td>
                     <td style={{ maxWidth: "150px", wordWrap: "break-word" }}>{customData.password}</td>
                     <td>
-                     <div>No {customData.address.doorno}</div> 
-                     <div>{customData.address.street}</div> 
-                     <div>{customData.address.city}</div>
-                     <div>{customData.address.state}</div>
-                     <div>{customData.address.pincode}</div>
-                      </td>
+                      <div>No {customData.address.doorno}</div>
+                      <div>{customData.address.street}</div>
+                      <div>{customData.address.city}</div>
+                      <div>{customData.address.state}</div>
+                      <div>{customData.address.pincode}</div>
+                    </td>
                     <td><button className='m-2' data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" onClick={() => setSelectedUpdate(customData._id)}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
                       <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
                     </svg></button><button data-bs-toggle="modal" data-bs-target="#exampleModal" onClick={() => setSelectedDelete(customData._id)}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
@@ -480,6 +519,73 @@ const Admin1 = () => {
           {/* <div class="tab-pane fade p-3 border w-50 text-center" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
             
           </div> */}
+
+          <div class=" tab-pane fade p-3" id="nav-connect2" role="tabpanel" aria-labelledby="nav-connect2-tab" >
+            <div className='container'>
+              <br />
+              {Array.isArray(setOrder) && setOrder.map((order, index) => (
+  <div key={order._id} style={{ display: 'flex', marginBottom: '20px' }}>
+    {/* Left column: User ID, Order ID, and Delivery address */}
+    <div style={{ flex: '1', paddingRight: '20px' }}>
+      <div style={{ backgroundColor: '#f0f0f0', padding: '20px', borderRadius: '10px', marginBottom: '10px' }}>
+        <div style={{ color: '#333', fontSize: '15px', fontWeight: 'bold', marginBottom: '10px' }}>User ID: {order.user}</div>
+        <div style={{ color: '#333', fontSize: '15px', fontWeight: 'bold', marginBottom: '10px' }}>Order Id: {order._id}</div>
+        <div style={{ textAlign: 'left' }}>
+          <h5 style={{ color: '#666', fontSize: '16px', fontStyle: 'italic', marginBottom: '10px' }}>
+            Delivery address: <br />
+            {order.deliveryAddress ? `${order.deliveryAddress.doorno}, ${order.deliveryAddress.street}, ${order.deliveryAddress.city}, ${order.deliveryAddress.state}, ${order.deliveryAddress.pincode}` : 'Address not available'}
+          </h5>
+        </div>
+        <h5 style={{ color: '#666', fontSize: '16px', fontStyle: 'italic', marginBottom: '10px' }}>PaymentMethod : <br />
+          Credit / Debit Card
+        </h5>
+      </div>
+    </div>
+
+    {/* Right column: Table */}
+    <div style={{ flex: '1' }}>
+      <table className="table table-bordered border-dark text-center">
+        <thead>
+          <tr>
+            <th scope="col">Image</th>
+            <th scope="col">ProductName</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Totalprice</th>
+            <th scope='col'>Ordered Date</th>
+            <th scope='col'>Excepted Delivered Date</th>
+            <th scope='col'>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {order.items.map((item, itemIndex) => (
+            <tr key={itemIndex}>
+              <td>
+                <img
+                  src={`http://localhost:8080/public/data/uploads/${item.product.image}`}
+                  style={{ height: '70px', width: '70px', border: '1px solid white', borderRadius: '10px' }}
+                  alt="Product"
+                />
+              </td>
+              <td>{item.product.productname}</td>
+              <td>{item.quantity}</td>
+              <td>{item.price}</td>
+              <td>{new Date(item.date).toLocaleString()}</td>
+              <td>{expectedDeliveryDate.toLocaleDateString()}</td>
+
+              <td>
+                <button style={{ backgroundColor: "green", color: "white", borderRadius: "7px" }}>Delivered Shortly</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+))}
+
+            </div>
+
+          </div>
           <div class="tab-pane fade p-3 border w-50 text-center" id="nav-connect" role="tabpanel" aria-labelledby="nav-connect-tab" style={product}>
             <AddProduct />
           </div>

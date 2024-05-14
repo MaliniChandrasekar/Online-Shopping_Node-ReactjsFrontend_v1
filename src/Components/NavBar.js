@@ -3,18 +3,20 @@ import { Navbar, Nav, Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Logo from '../logo1.PNG'
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 function NavBar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [set, setCartItems] = useState('')
+  const userId = sessionStorage.getItem('userId')
   const navigate = useNavigate()
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
+
   const handleLogout = () => {
-    // Perform logout logic...
-    // setIsLoggedIn(false);
-    // Remove user ID from sessionStorage
+    console.log("HEllo")
     sessionStorage.removeItem('userId');
     navigate("/")
   };
@@ -24,11 +26,31 @@ function NavBar() {
     borderRadius: '5px'
 
   }
+
+  useEffect(() => {
+    fetch(`http://localhost:8080/cart/${userId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setCartItems(data.productCount);
+        console.log("Current", data.productCount)
+        // calculateTotalPrice(data);
+      })
+      .catch(error => {
+        console.error('Error during fetch', error);
+      });
+  }, []);
+
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
       <br></br>
       <div className="container-fluid">
-        <a className="navbar-brand" href="#"><img className='logo1' style={{ height: '70px', width: '100px' }} src={Logo} /></a>
+        <a className="navbar-brand" href="#"><img className='logo1' style={{ height: '55px', width: '100px' }} src={Logo} /></a>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
@@ -49,12 +71,12 @@ function NavBar() {
             </li>
             <li className="nav-item">
               <a className="nav-link active fw-bold" href="/">
-              BLOG
+                BLOG
               </a>
             </li>
             <li className="nav-item">
               <a className="nav-link active fw-bold" href="/">
-               PAGES
+                PAGES
               </a>
             </li>
             <li className="nav-item">
@@ -81,9 +103,12 @@ function NavBar() {
 
                 {/* Dropdown menu */}
                 <div className={`dropdown-menu${dropdownOpen ? ' show' : ''}`} aria-labelledby="navbarDropdown">
-                  {/* Dropdown items */}
-                  <a className="dropdown-item" href="/login/price">Admin</a>
-                  <a className="dropdown-item" href="" onClick={handleLogout}>Logout</a>
+                  {/* Conditional rendering based on user ID */}
+                  {userId ? (
+                    <a className="dropdown-item" href="#" onClick={handleLogout}>Logout</a>
+                  ) : (
+                    <a className="dropdown-item" href="/login/price" >Login</a>
+                  )}
                 </div>
               </div>
             </div>
@@ -93,9 +118,26 @@ function NavBar() {
               </svg><font className="text-dark p-1">WishList</font>
             </a></div>
             <div className="p-2"><a className="nav-link active fw-bold" href="/cart" style={{ textDecoration: 'none' }}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="text-primary" viewBox="0 0 16 16">
-                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
-              </svg><font className="text-dark p-1">  Cart</font>
+              <div style={{ position: 'relative', display: 'inline-block' }}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="25"
+                  height="25"
+                  fill="currentColor"
+                  className="text-primary"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                </svg>
+                <span style={{ position: 'absolute', top: '-10px', right: '-10px', backgroundColor: '#4169E1', color: 'white', borderRadius: '50%', padding: '5px', fontSize: '12px' }}>{set}</span>
+              </div>
+
+              {/* <font className="text-dark p-1">  Cart</font> */}
+            </a></div>
+            <div className="p-2"><a className="nav-link active fw-bold" href="/o" style={{ textDecoration: 'none' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bag-check-fill" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M10.5 3.5a2.5 2.5 0 0 0-5 0V4h5zm1 0V4H15v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4h3.5v-.5a3.5 3.5 0 1 1 7 0m-.646 5.354a.5.5 0 0 0-.708-.708L7.5 10.793 6.354 9.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0z" />
+              </svg><font className="text-dark p-1"> Orders</font>
             </a></div>
           </div>
         </div>

@@ -15,6 +15,12 @@ const Login = () => {
     password: ""
   });
 
+  const handleLogout = () => {
+    console.log("HEllo")
+    sessionStorage.removeItem('userId');
+    navigate("/")
+  };
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
@@ -105,6 +111,7 @@ const Login = () => {
           <p style={m1}>Password: <input type='password' placeholder='enter your password' name='password' value={formData.password} onChange={handleChange} /></p>
           <p style={m1}>Don't you have an account? : <Link to={`/signup/${price}`}>SignUp</Link></p>
           <button onClick={handleSubmit}>Login</button>
+          <button onClick={handleLogout} className='m-2'>Skip</button>
         </div>
       </div>
     </div>
