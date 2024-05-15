@@ -250,13 +250,13 @@ const Admin1 = () => {
         lastname: updateData.lastname,
         email: updateData.email,
         password: updateData.password,
-        addressData: {
+        
           doorno: updateData.doorno,
           street: updateData.street,
           city: updateData.city,
           state: updateData.state,
           pincode: updateData.pincode
-        }
+        
       };
 
       const updateResponse = await fetch(`http://localhost:8080/user/${setUpdate}`, {
